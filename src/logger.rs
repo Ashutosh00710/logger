@@ -26,19 +26,13 @@ pub mod logger {
     pub log_for: Vec<String>
   }
 
-  impl Default for LoggingService {
-    fn default() -> Self {
+  impl LoggingService {
+    pub fn new() -> Self {
         LoggingService {
           log_level: String::from("PROD"),
           name: String::from("UNKNOWN SECTION"),
           log_for: Vec::new()
         }
-    }
-  }
-
-  impl LoggingService {
-    pub fn new() -> Self {
-        LoggingService::default()
     }
 
     fn format(&self) -> (u32, DelayedFormat<StrftimeItems>, &String) {
