@@ -13,16 +13,34 @@ pub mod logger {
   ///      name: String::from("main")
   /// }
   ///
+  /// // OR
+  /// let console = Logger::LoggingService::new();
+  ///
   /// console.log([1, 2, 3]);
   /// console.error(String::from("Error Message"));
   /// console.warn(String::from("Warning Message"));
-  /// ```
+  ///
   pub struct LoggingService {
     pub log_level: String,
-    pub name: String
+    pub name: String,
+    pub log_for: Vec<String>
+  }
+
+  impl Default for LoggingService {
+    fn default() -> Self {
+        LoggingService {
+          log_level: String::from("PROD"),
+          name: String::from("UNKNOWN SECTION"),
+          log_for: Vec::new()
+        }
+    }
   }
 
   impl LoggingService {
+    pub fn new() -> Self {
+        LoggingService::default()
+    }
+
     fn format(&self) -> (u32, DelayedFormat<StrftimeItems>, &String) {
       let now = chrono::Local::now();
       (
@@ -34,7 +52,7 @@ pub mod logger {
 
     pub fn log<T>(&self, message: T)
       where T: std::fmt::Debug  {
-      if self.log_level == "dev" {
+      if self.log_for.contains(&self.log_level) {
         let (process_id, time, name) = self.format();
         println!("[{process_id}] - {time} - \x1B[33m[{name}]\x1B[39m \x1B[32m{:?}\x1B[39m", message);
       }
@@ -48,7 +66,7 @@ pub mod logger {
 
     pub fn warn<T>(&self, message: T)
       where T: std::fmt::Debug {
-      if self.log_level == "dev" {
+      if self.log_for.contains(&self.log_level) {
         let (process_id, time, name) = self.format();
         println!("[{process_id}] - {time} - \x1B[33m[{name}]\x1B[39m \x1B[33m{:?}\x1B[39m", message);
       }
